@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google-adsense-account" content="ca-pub-9667911811925617" />
+  <title>Blog | Reylan – Student Developer & Builder</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-dot"></span>
+      <span class="logo-text">Reylan</span>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">About</a>
+      <a href="projects.html">Projects</a>
+      <a href="blog.html" class="active">Blog</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section">
+      <h1>Blog</h1>
+      <p class="section-intro">
+        I use this space as a dev log and journal for my projects like BalayKo, ITechCare3D,
+        and this portfolio. It’s not perfect, but it’s real.
+      </p>
+
+      <div class="posts-grid">
+        <!-- Post 1 -->
+        <article class="post-card">
+          <h2>BalayKo: Why I’m Building a Student Housing Platform</h2>
+          <p class="post-meta">Project dev log · BalayKo</p>
+          <p>
+            BalayKo started as a simple idea: make it less stressful for students to find a place
+            to stay. Boarding houses, dorms, apartments — most of the time, information travels
+            through friends, random Facebook posts, or “may alam ka bang vacant?” conversations.
+            There’s no single, organized place just for student housing.
+          </p>
+          <p>
+            My goal with BalayKo is to build a focused platform for students and landlords.
+            Students should be able to see listings with clear details, prices, locations, and
+            photos instead of guessing. Landlords should have a simple way to post and manage
+            their properties without needing to be “techy”.
+          </p>
+          <p>
+            The core idea is two sides: <strong>tenants</strong> and <strong>landlords</strong>.
+            Tenants can browse, favorite, and (in the future) request bookings for short or
+            long stays. Landlords can create listings, upload multiple images, and manage
+            their spaces in one place. I also want to support things like reviews, basic
+            verification, and maybe payment integration later.
+          </p>
+          <p>
+            On the technical side, I’m experimenting with a stack that matches what I use in
+            school projects: Node.js, Express, EJS templates, and a database behind it. Right now
+            it’s more of a prototype, but the vision is bigger — something that can eventually
+            be used as a thesis system and maybe a real startup for local student housing.
+          </p>
+          <p>
+            BalayKo is still in progress, but every commit teaches me something new about
+            structure, data, and how real-world problems are more complicated than “just code”.
+          </p>
+        </article>
+
+        <!-- Post 2 -->
+        <article class="post-card">
+          <h2>ITechCare3D: My Technician Management System Concept</h2>
+          <p class="post-meta">Project dev log · ITechCare3D</p>
+          <p>
+            ITechCare3D came from a different kind of problem: tracking technicians, tasks, and
+            service jobs in a more organized way. A lot of small service businesses still manage
+            things using group chats, notebooks, and memory. That works until it doesn’t — when
+            there are too many jobs, missed schedules, or confusion about who handled what.
+          </p>
+          <p>
+            The idea behind ITechCare3D is to centralize all of this into one system. There would
+            be a place to store technician profiles, assign tasks, track job status, and maybe
+            collect ratings or feedback. Instead of “sino ulit pumunta sa client na ‘to?”, the
+            system should show a clear history.
+          </p>
+          <p>
+            One thing I want ITechCare3D to have is a clean, modern interface. That’s why I
+            started with a magenta-themed UI — something different from the usual gray admin
+            dashboards. I want the system to feel pleasant to use, even if it’s just for
+            internal operations.
+          </p>
+          <p>
+            Right now, many features are still in the planning or prototype stage, but every step
+            (like building technician CRUD, dealing with forms, or handling errors) helps me
+            improve as a developer. ITechCare3D is my way of practicing how to design systems
+            that make real workflows easier, not just pass a school requirement.
+          </p>
+        </article>
+
+        <!-- Post 3 -->
+        <article class="post-card">
+          <h2>What I Learned Building My First Portfolio Website</h2>
+          <p class="post-meta">Dev log · Portfolio</p>
+          <p>
+            This portfolio at <strong>reylanquitaolivar.netlify.app</strong> is my first real
+            attempt at putting myself online as a student developer. It looks simple on the
+            surface, but getting it from “idea” to “live website” taught me a lot.
+          </p>
+          <p>
+            I started with the basics: HTML for the structure, CSS for the dark theme and layout,
+            and a tiny bit of JavaScript just to handle small things like the year in the footer.
+            Then I organized everything into a clean folder structure, with separate files for
+            styles and scripts. It seems obvious now, but it really helps to keep things tidy.
+          </p>
+          <p>
+            The next step was learning to use Git and GitHub properly. Initializing a repository,
+            committing changes, and pushing to a remote repo made me feel more like a “real”
+            developer. I also hit common errors like “fetch first” or issues with folders and
+            paths, but fixing them taught me how Git actually thinks about changes.
+          </p>
+          <p>
+            Deploying to Netlify was another big moment. At first I got 404 errors and broken
+            links because my publish directory and paths weren’t set correctly. After some trial
+            and error, I learned how to point Netlify to the proper folder and how each deploy
+            connects to my GitHub branch.
+          </p>
+          <p>
+            Overall, this portfolio is still small, but it’s a start. It gives me a home base to
+            link my projects, write dev logs like this, and gradually build up a public record of
+            what I’m learning as a student developer.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> Reylan | Student Developer & Builder</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
