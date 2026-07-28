@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Dashboard</title>
+  <!-- Supabase Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* --- RESET & BASE --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f9;
+      color: #1e293b;
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .hidden { display: none !important; }
+
+    /* --- CARDS & CONTAINERS --- */
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    .subtitle { color: #64748b; margin-bottom: 20px; }
+
+    /* --- AUTH (Login / Signup) --- */
+    #auth-container {
+      max-width: 400px;
+      margin: 60px auto;
+    }
+    #auth-container h2 { margin-bottom: 16px; }
+    #auth-container input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    #auth-container button {
+      width: 100%;
+      padding: 12px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #auth-container button:hover { background: #2563eb; }
+    .auth-toggle {
+      margin-top: 12px;
+      text-align: center;
+      color: #3b82f6;
+      cursor: pointer;
+    }
+    .auth-toggle:hover { text-decoration: underline; }
+
+    /* --- TASK FORM --- */
+    .task-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+    }
+    .task-form .field {
+      flex: 1 1 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .task-form label { font-size: 14px; font-weight: 600; color: #475569; }
+    .task-form input, .task-form select {
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 15px;
+      background: white;
+    }
+    .task-form button {
+      padding: 10px 24px;
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      height: 42px;
+      align-self: flex-end;
+    }
+    .task-form button:hover { background: #16a34a; }
+
+    /* --- TASK LIST --- */
+    .task-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border-radius: 10px;
+      border-left: 4px solid #3b82f6;
+      margin-bottom: 10px;
+    }
+    .task-item .info { display: flex; flex-direction: column; gap: 4px; }
+    .task-item .title { font-weight: 600; }
+    .task-item .meta { font-size: 14px; color: #64748b; }
+    .task-item .actions {
+      display: flex;
+      gap: 8px;
+    }
+    .task-item .actions button {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-done { background: #22c55e; color: white; }
+    .btn-done:hover { background: #16a34a; }
+    .btn-delete { background: #ef4444; color: white; }
+    .btn-delete:hover { background: #dc2626; }
+    .task-item.done {
+      opacity: 0.6;
+      border-left-color: #22c55e;
+      text-decoration: line-through;
+    }
+
+    /* --- HEADER / LOGOUT --- */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .btn-logout {
+      padding: 8px 20px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-logout:hover { background: #dc2626; }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 600px) {
+      .task-form { flex-direction: column; }
+      .task-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!--  AUTH SECTION (Login / Signup)                                -->
+<!-- ============================================================ -->
+<div id="auth-container" class="card">
+  <h2 id="auth-title">Welcome Back</h2>
+  <p id="auth-sub" class="subtitle">Sign in to manage your team tasks</p>
+  
+  <input type="email" id="auth-email" placeholder="Email address" />
+  <input type="password" id="auth-password" placeholder="Password (min 6 chars)" />
+  <button id="auth-action-btn">Sign In</button>
+  
+  <div id="auth-toggle" class="auth-toggle">
+    Don't have an account? <strong>Sign Up</strong>
+  </div>
+  <div id="auth-error" style="color:#ef4444; margin-top:10px; font-size:14px;"></div>
+</div>
+
+<!-- ============================================================ -->
+<!--  DASHBOARD SECTION (Visible after login)                     -->
+<!-- ============================================================ -->
+<div id="dashboard-container" class="hidden">
+  
+  <!-- Header -->
+  <div class="header-bar">
+    <div>
+      <h1>📋 Task Dashboard</h1>
+      <p class="subtitle">Assign tasks to your development team</p>
+    </div>
+    <button class="btn-logout" id="logout-btn">Sign Out</button>
+  </div>
+
+  <!-- Add Task Form -->
+  <div class="card">
+    <h3>➕ Add New Task</h3>
+    <form id="task-form" class="task-form">
+      <div class="field">
+        <label for="task-title">Task Title</label>
+        <input type="text" id="task-title" placeholder="e.g. Fix the login bug" required />
+      </div>
+      <div class="field">
+        <label for="task-assignee">Assign To</label>
+        <input type="text" id="task-assignee" placeholder="Developer name (e.g. Tommy)" />
+      </div>
+      <button type="submit">Add Task</button>
+    </form>
+  </div>
+
+  <!-- Task List -->
+  <div class="card">
+    <h3>📌 All Tasks</h3>
+    <div id="task-list">
+      <p style="color:#94a3b8;">Loading tasks...</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!--  JAVASCRIPT                                                  -->
+<!-- ============================================================ -->
+<script>
+  // ============================================================
+  // 1. SUPABASE SETUP
+  //    🔴 IMPORTANT: Replace these with YOUR actual keys from 
+  //    Supabase Dashboard > Settings > API
+  // ============================================================
+  const SUPABASE_URL = 'https://vuuzbhdnlvmxjhxrdfwo.supabase.co';  // <-- YOUR URL
+  const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE';                   // <-- YOUR ANON KEY
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ============================================================
+  // 2. DOM REFS
+  // ============================================================
+  const authContainer = document.getElementById('auth-container');
+  const dashboardContainer = document.getElementById('dashboard-container');
+  const authTitle = document.getElementById('auth-title');
+  const authSub = document.getElementById('auth-sub');
+  const authEmail = document.getElementById('auth-email');
+  const authPassword = document.getElementById('auth-password');
+  const authActionBtn = document.getElementById('auth-action-btn');
+  const authToggle = document.getElementById('auth-toggle');
+  const authError = document.getElementById('auth-error');
+  const taskList = document.getElementById('task-list');
+  const taskForm = document.getElementById('task-form');
+  const taskTitle = document.getElementById('task-title');
+  const taskAssignee = document.getElementById('task-assignee');
+  const logoutBtn = document.getElementById('logout-btn');
+
+  let isLoginMode = true; // true = Login, false = Signup
+
+  // ============================================================
+  // 3. AUTH FUNCTIONS
+  // ============================================================
+  async function handleAuth() {
+    const email = authEmail.value.trim();
+    const password = authPassword.value.trim();
+    authError.textContent = '';
+
+    if (!email || password.length < 6) {
+      authError.textContent = 'Please enter a valid email and password (min 6 chars).';
+      return;
+    }
+
+    let result;
+    if (isLoginMode) {
+      result = await supabase.auth.signInWithPassword({ email, password });
+    } else {
+      result = await supabase.auth.signUp({ email, password });
+    }
+
+    const { data, error } = result;
+    if (error) {
+      authError.textContent = error.message;
+      return;
+    }
+
+    // If signup successful, show a message and switch to login mode.
+    if (!isLoginMode && data.user) {
+      authError.textContent = '✅ Account created! Please sign in.';
+      // Switch to login mode automatically
+      isLoginMode = true;
+      updateAuthUI();
+      authPassword.value = '';
+      return;
+    }
+
+    // If login successful, user is logged in.
+    if (isLoginMode && data.user) {
+      authError.textContent = '';
+      showDashboard();
+    }
+  }
+
+  async function checkSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      showDashboard();
+    } else {
+      showAuth();
+    }
+  }
+
+  function showDashboard() {
+    authContainer.classList.add('hidden');
+    dashboardContainer.classList.remove('hidden');
+    loadTasks();
+  }
+
+  function showAuth() {
+    authContainer.classList.remove('hidden');
+    dashboardContainer.classList.add('hidden');
+  }
+
+  function updateAuthUI() {
+    if (isLoginMode) {
+      authTitle.textContent = 'Welcome Back';
+      authSub.textContent = 'Sign in to manage your team tasks';
+      authActionBtn.textContent = 'Sign In';
+      authToggle.innerHTML = `Don't have an account? <strong>Sign Up</strong>`;
+    } else {
+      authTitle.textContent = 'Create Account';
+      authSub.textContent = 'Start managing your team tasks';
+      authActionBtn.textContent = 'Sign Up';
+      authToggle.innerHTML = `Already have an account? <strong>Sign In</strong>`;
+    }
+    authError.textContent = '';
+  }
+
+  // Toggle between Login and Signup
+  authToggle.addEventListener('click', () => {
+    isLoginMode = !isLoginMode;
+    updateAuthUI();
+    authPassword.value = '';
+  });
+
+  authActionBtn.addEventListener('click', handleAuth);
+
+  // Allow Enter key to submit auth
+  authPassword.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleAuth();
+  });
+  authEmail.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleAuth();
+  });
+
+  // ============================================================
+  // 4. TASKS CRUD
+  // ============================================================
+  async function loadTasks() {
+    taskList.innerHTML = '<p style="color:#94a3b8;">Loading tasks...</p>';
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      taskList.innerHTML = `<p style="color:#ef4444;">Error loading tasks: ${error.message}</p>`;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      taskList.innerHTML = '<p style="color:#94a3b8;">No tasks yet. Add your first task above!</p>';
+      return;
+    }
+
+    let html = '';
+    data.forEach(task => {
+      const isDone = task.status === 'Done';
+      html += `
+        <div class="task-item ${isDone ? 'done' : ''}">
+          <div class="info">
+            <span class="title">${escapeHtml(task.title)}</span>
+            <span class="meta">
+              Assigned to: ${escapeHtml(task.assigned_to || 'Unassigned')} &bull; 
+              Status: ${task.status || 'Pending'}
+            </span>
+          </div>
+          <div class="actions">
+            ${!isDone ? `<button class="btn-done" onclick="markDone('${task.id}')">Done</button>` : ''}
+            <button class="btn-delete" onclick="deleteTask('${task.id}')">Delete</button>
+          </div>
+        </div>
+      `;
+    });
+    taskList.innerHTML = html;
+  }
+
+  async function addTask(e) {
+    e.preventDefault();
+    const title = taskTitle.value.trim();
+    const assignedTo = taskAssignee.value.trim();
+
+    if (!title) {
+      alert('Please enter a task title.');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('tasks')
+      .insert([{ 
+        title, 
+        assigned_to: assignedTo || null,
+        status: 'Pending'
+      }]);
+
+    if (error) {
+      alert('Error adding task: ' + error.message);
+      return;
+    }
+
+    taskTitle.value = '';
+    taskAssignee.value = '';
+    loadTasks();
+  }
+
+  async function markDone(id) {
+    const { error } = await supabase
+      .from('tasks')
+      .update({ status: 'Done' })
+      .eq('id', id);
+
+    if (error) {
+      alert('Error updating task: ' + error.message);
+      return;
+    }
+    loadTasks();
+  }
+
+  async function deleteTask(id) {
+    if (!confirm('Delete this task?')) return;
+    const { error } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      alert('Error deleting task: ' + error.message);
+      return;
+    }
+    loadTasks();
+  }
+
+  // Helper to escape HTML to prevent XSS
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // ============================================================
+  // 5. LOGOUT
+  // ============================================================
+  logoutBtn.addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    showAuth();
+  });
+
+  // ============================================================
+  // 6. FORM EVENT
+  // ============================================================
+  taskForm.addEventListener('submit', addTask);
+
+  // ============================================================
+  // 7. INIT
+  // ============================================================
+  updateAuthUI();
+  checkSession();
+</script>
+</body>
+</html>
